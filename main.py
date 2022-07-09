@@ -28,6 +28,7 @@ class Simplex:
         self.B_vector = B_vector
         self.c_vector = c_vector
         self.plan = plan
+        self.is_there_solution = True
         self.calculate()
     
     def calculate(self):
@@ -37,6 +38,8 @@ class Simplex:
             for j in range(self.m):
                 self.z_vector[i] += self.A_matrix[j][i]*self.c_vector[self.plan[j] - 1]
             self.z_vector[i] -= self.c_vector[i]
+
+        # print(f'z={self.z_vector}')
 
         self.z_B = 0
         for k in range(self.m):
@@ -64,12 +67,20 @@ class Simplex:
         vector_b = self.B_vector
         # print(f'B={vector_b}')
         vector_A_i_q = [self.A_matrix[i][self.q - 1] for i in range(self.m)]
-        # print(f'A_iq={vector_A_i_q}')
+        # print(f'A_i_q={vector_A_i_q}')
         vector = [vector_b[i]/vector_A_i_q[i] for i in range(self.m)]
-        min_ind = 0
-        for i in range(1, self.m):
+        # print(f'vector={vector}')
+        min_ind = -1
+        for i in range(0, self.m):
+            if min_ind == -1 and vector_A_i_q[i] > 0:
+                min_ind = i
+                continue
             if vector[i] < vector[min_ind] and vector_A_i_q[i] > 0:
                 min_ind = i
+        
+        if min_ind == -1:
+            self.is_there_solution = False
+
         self.p = min_ind
 
     def is_solution(self):
@@ -108,37 +119,39 @@ class Simplex:
     def find_min(self):
         i = 0
         while not self.is_solution():
-            print(f'i={i}\n')
+            # print(f'i={i}\n')
             i += 1
-            if self.no_solution():
+            if self.no_solution() or not self.is_there_solution:
                 return None
             self.update_q()
             self.update_p()
 
-            print(self.p, self.q)
-            print()
+            # print(self.p + 1, self.q + 1)
+            # print()
 
             self.simplex_matrix.change_basis(self.p, self.q)
             self.recalculate()
 
-            for l in self.simplex_matrix.matrix:
-                print(l)
+            # for l in self.simplex_matrix.matrix:
+            #     print(l)
 
-            print()
+            # print()
 
-            # if i == 10: break
+            # if i == 2: break
         return self.simplex_matrix.matrix
 
 a_matrix = [
-    [1,2,1,0],
-    [0,1,2,1]
+    [1,0,3,1],
+    [1,1,-2,0]
 ]
 
-b_vector = [8,6]
+b_vector = [10,7]
 
-c_vector = [4,3,-1,-1]
+c_vector = [1,2,-1,2]
 
-simplex = Simplex(4, 2, a_matrix, b_vector, c_vector, [1,4])
+plan = [4,2]
+
+simplex = Simplex(4, 2, a_matrix, b_vector, c_vector, plan)
 matrix = simplex.find_min()
 
 for l in matrix:

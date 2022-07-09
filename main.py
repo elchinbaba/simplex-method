@@ -6,11 +6,7 @@ class Matrix:
 
     def change_basis(self, p, q):
         a_p_q = self.matrix[p][q]
-        # print(f'p={p} q={q}')
-        # for l in self.matrix:
-        #     print(l)
-        # print(self.matrix[p][q])
-        # print(f'a_pq={a_p_q}')
+
         for i in range(self.n):
             self.matrix[p][i] /= a_p_q
 
@@ -39,8 +35,6 @@ class Simplex:
                 self.z_vector[i] += self.A_matrix[j][i]*self.c_vector[self.plan[j] - 1]
             self.z_vector[i] -= self.c_vector[i]
 
-        # print(f'z={self.z_vector}')
-
         self.z_B = 0
         for k in range(self.m):
             self.z_B += self.B_vector[k]*self.c_vector[self.plan[k] - 1]
@@ -65,11 +59,8 @@ class Simplex:
 
     def update_p(self):
         vector_b = self.B_vector
-        # print(f'B={vector_b}')
         vector_A_i_q = [self.A_matrix[i][self.q - 1] for i in range(self.m)]
-        # print(f'A_i_q={vector_A_i_q}')
         vector = [vector_b[i]/vector_A_i_q[i] for i in range(self.m)]
-        # print(f'vector={vector}')
         min_ind = -1
         for i in range(0, self.m):
             if min_ind == -1 and vector_A_i_q[i] > 0:
@@ -107,35 +98,22 @@ class Simplex:
             for j in range(self.n):
                 self.A_matrix[i][j] = matrix[i][j + 1]
         # self.A_matrix = [[matrix[i] for i in range(1, self.m)][j] for j in range(1, self.n)]
-        # print(f'A={self.A_matrix}')
         # self.z_vector = [matrix[self.m][j] for j in range(1, self.n)]
         self.z_vector = matrix[self.m][1:self.n + 1]
-        # print(f'z={self.z_vector}')
         self.z_B = matrix[self.m][0]
-        # print(f'z_B={self.z_B}')
-        # print()
 
 
     def find_min(self):
         i = 0
         while not self.is_solution():
-            # print(f'i={i}\n')
             i += 1
             if self.no_solution() or not self.is_there_solution:
                 return None
             self.update_q()
             self.update_p()
 
-            # print(self.p + 1, self.q + 1)
-            # print()
-
             self.simplex_matrix.change_basis(self.p, self.q)
             self.recalculate()
-
-            # for l in self.simplex_matrix.matrix:
-            #     print(l)
-
-            # print()
 
             # if i == 2: break
         return self.simplex_matrix.matrix

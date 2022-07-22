@@ -23,9 +23,9 @@ class Simplex:
         self.A_matrix = A_matrix
         self.B_vector = B_vector
         self.c_vector = c_vector
-        self.plan = plan
+        self.plan = plan # First step of the algorithm
         self.is_there_solution = True
-        self.calculate()
+        self.calculate() # Step 2
     
     def calculate(self):
         self.z_vector = []
@@ -49,7 +49,7 @@ class Simplex:
         self.simplex_matrix.append(mat)
         self.simplex_matrix = Matrix(self.n + 1, self.m + 1, self.simplex_matrix)
     
-    def update_q(self):
+    def update_q(self): # Step 5.1
         vector = self.z_vector
         max_ind = 0
         for i in range(1, self.n):
@@ -57,7 +57,7 @@ class Simplex:
                 max_ind = i
         self.q = max_ind + 1
 
-    def update_p(self):
+    def update_p(self): # Step 5.2
         vector_b = self.B_vector
         vector_A_i_q = [self.A_matrix[i][self.q - 1] for i in range(self.m)]
         vector = [vector_b[i]/vector_A_i_q[i] for i in range(self.m)]
@@ -74,13 +74,13 @@ class Simplex:
 
         self.p = min_ind
 
-    def is_solution(self):
+    def is_solution(self): # Step 3
         for j in range(self.n):
             if self.z_vector[j] > 0:
                 return False
         return True
 
-    def no_solution(self):
+    def no_solution(self): # Step 4
         for j in range(self.n):
             if self.z_vector[j] > 0:
                 check = True
@@ -91,7 +91,7 @@ class Simplex:
                 if check == True:
                     return True
 
-    def recalculate(self):
+    def recalculate(self): # Step 6
         matrix = self.simplex_matrix.matrix
         self.B_vector = [matrix[i][0] for i in range(self.m)]
         for i in range(self.m):
@@ -105,7 +105,7 @@ class Simplex:
 
     def find_min(self):
         i = 0
-        while not self.is_solution():
+        while not self.is_solution(): # Step 7
             i += 1
             if self.no_solution() or not self.is_there_solution:
                 return None
